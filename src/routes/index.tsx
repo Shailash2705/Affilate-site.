@@ -273,7 +273,7 @@ function FeedbackSection() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (Number(captchaAnswer) !== captcha.a + captcha.b) {
+    if (!captcha || Number(captchaAnswer) !== captcha.a + captcha.b) {
       toast.error("Captcha incorrect");
       return;
     }
@@ -329,7 +329,7 @@ function FeedbackSection() {
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Quick check:</span>
             <span className="font-medium">
-              {captcha.a} + {captcha.b} =
+              {captcha ? `${captcha.a} + ${captcha.b} =` : "… =" }
             </span>
             <Input
               type="number"
