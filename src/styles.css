@@ -132,7 +132,22 @@
   .glass-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 20px 50px rgba(31, 38, 135, 0.18);
-    border-color: rgba(115, 209, 211, 0.6);
+    border-color: color-mix(in srgb, var(--brand-1) 60%, transparent);
+  }
+  .dark .glass {
+    background: rgba(20, 24, 40, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  .dark .glass-strong {
+    background: rgba(20, 24, 40, 0.6);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+  .dark .glass-card {
+    background: rgba(20, 24, 40, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
   .float-anim {
     animation: float 7s ease-in-out infinite;
