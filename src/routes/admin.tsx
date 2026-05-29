@@ -68,13 +68,21 @@ function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="glass-strong rounded-3xl p-8 max-w-md text-center">
-          <h1 className="text-xl font-bold">Access denied</h1>
+          <div className="mx-auto h-12 w-12 rounded-2xl bg-gradient-to-br from-[var(--brand-1)] to-[var(--brand-3)] mb-4 animate-pulse" />
+          <h1 className="text-xl font-bold">Waiting for admin access</h1>
           <p className="text-muted-foreground text-sm mt-2">
-            You're signed in but don't have admin privileges.
+            You're signed in as <span className="font-medium text-foreground">{user.email}</span>,
+            but no admin role is assigned yet. Once the site owner grants access,
+            this page will unlock automatically — no refresh needed.
           </p>
-          <Button onClick={() => supabase.auth.signOut()} className="mt-4 rounded-full">
-            Sign out
-          </Button>
+          <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
+            <Button onClick={() => navigate({ to: "/" })} variant="ghost" className="rounded-full">
+              Back to site
+            </Button>
+            <Button onClick={() => supabase.auth.signOut()} className="rounded-full bg-foreground text-background">
+              Sign out
+            </Button>
+          </div>
         </div>
       </div>
     );

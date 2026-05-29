@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Sparkles, ShieldCheck, Send } from "lucide-react";
+import { Search, Sparkles, ShieldCheck, Send, Tag, LayoutGrid } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,9 +29,12 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const ALL = "all";
+
 function Home() {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<string>(ALL);
 
   useEffect(() => {
     supabase
@@ -44,17 +47,32 @@ function Home() {
       });
   }, []);
 
+  const categories = useMemo(() => {
+    if (!products) return [];
+    const map = new Map<string, number>();
+    for (const p of products) {
+      const c = (p.category || "general").toLowerCase();
+      map.set(c, (map.get(c) ?? 0) + 1);
+    }
+    return Array.from(map.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [products]);
+
   const filtered = useMemo(() => {
     if (!products) return null;
     const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter(
-      (p) =>
+    return products.filter((p) => {
+      if (category !== ALL && p.category.toLowerCase() !== category) return false;
+      if (!q) return true;
+      return (
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
-        p.platform.toLowerCase().includes(q),
-    );
-  }, [products, query]);
+        p.platform.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q)
+      );
+    });
+  }, [products, query, category]);
 
   return (
     <div className="min-h-screen">
@@ -64,13 +82,13 @@ function Home() {
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 pt-16 md:pt-24 pb-12 text-center fade-up">
         <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs mb-6">
-          <Sparkles className="h-3.5 w-3.5 text-[#DBA380]" />
+          <Sparkles className="h-3.5 w-3.5 text-[var(--brand-3)]" />
           Handpicked daily
         </div>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
           Premium picks,
           <br />
-          <span className="bg-gradient-to-r from-[#73D1D3] via-[#BADCC3] to-[#DBA380] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[var(--brand-1)] via-[var(--brand-2)] to-[var(--brand-3)] bg-clip-text text-transparent">
             beautifully curated.
           </span>
         </h1>
@@ -104,15 +122,68 @@ function Home() {
         </div>
       </section>
 
+      {/* Categories */}
+      <section id="categories" className="max-w-6xl mx-auto px-4 py-8 scroll-mt-24">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+              <Tag className="h-6 w-6 text-[var(--brand-3)]" /> Browse by category
+            </h2>
+            <p className="text-muted-foreground text-sm mt-1">
+              Find exactly what you're looking for.
+            </p>
+          </div>
+        </div>
+
+        {!products && (
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-28 rounded-full bg-white/40" />
+            ))}
+          </div>
+        )}
+
+        {products && (
+          <div className="flex flex-wrap gap-2">
+            <CategoryChip
+              active={category === ALL}
+              onClick={() => setCategory(ALL)}
+              label="All"
+              count={products.length}
+              icon={<LayoutGrid className="h-3.5 w-3.5" />}
+            />
+            {categories.map((c) => (
+              <CategoryChip
+                key={c.name}
+                active={category === c.name}
+                onClick={() => {
+                  setCategory(c.name);
+                  document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                label={c.name}
+                count={c.count}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* Products */}
       <section id="products" className="max-w-6xl mx-auto px-4 py-12 scroll-mt-24">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold">Latest Picks</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">
+              {category === ALL ? "Latest Picks" : <span className="capitalize">{category}</span>}
+            </h2>
             <p className="text-muted-foreground text-sm mt-1">
-              {filtered ? `${filtered.length} products` : "Loading..."}
+              {filtered ? `${filtered.length} product${filtered.length === 1 ? "" : "s"}` : "Loading..."}
             </p>
           </div>
+          {category !== ALL && (
+            <Button variant="ghost" onClick={() => setCategory(ALL)} className="rounded-full">
+              Clear filter
+            </Button>
+          )}
         </div>
 
         {!filtered && (
@@ -125,10 +196,10 @@ function Home() {
 
         {filtered && filtered.length === 0 && (
           <div className="glass rounded-3xl p-12 text-center">
-            <p className="text-lg font-medium">No products yet</p>
+            <p className="text-lg font-medium">No products found</p>
             <p className="text-muted-foreground text-sm mt-2">
-              {query
-                ? "Try a different search."
+              {query || category !== ALL
+                ? "Try a different search or category."
                 : "Sign in as admin to add the first product."}
             </p>
           </div>
@@ -152,10 +223,44 @@ function Home() {
   );
 }
 
+function CategoryChip({
+  active,
+  onClick,
+  label,
+  count,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  count: number;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm capitalize transition border ${
+        active
+          ? "bg-foreground text-background border-foreground"
+          : "glass border-white/50 hover:bg-white/60 dark:hover:bg-white/10"
+      }`}
+    >
+      {icon}
+      <span>{label}</span>
+      <span
+        className={`text-xs rounded-full px-1.5 py-0.5 ${
+          active ? "bg-background/20" : "bg-foreground/10"
+        }`}
+      >
+        {count}
+      </span>
+    </button>
+  );
+}
+
 function FeedbackSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
-  // simple math captcha
   const [captcha] = useState(() => ({
     a: Math.floor(Math.random() * 9) + 1,
     b: Math.floor(Math.random() * 9) + 1,
@@ -233,7 +338,7 @@ function FeedbackSection() {
           <Button
             type="submit"
             disabled={loading}
-            className="sm:ml-auto rounded-full bg-gradient-to-r from-[#73D1D3] to-[#DBA380] text-foreground hover:opacity-90"
+            className="sm:ml-auto rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground hover:opacity-90"
           >
             {loading ? "Sending..." : (<>Send <Send className="ml-2 h-4 w-4" /></>)}
           </Button>

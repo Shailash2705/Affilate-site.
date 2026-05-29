@@ -30,13 +30,16 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-brand-teal: #73D1D3;
-  --color-brand-sage: #BADCC3;
-  --color-brand-peach: #DBA380;
+  --color-brand-1: var(--brand-1);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
   --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 :root {
+  --brand-1: #73D1D3;
+  --brand-2: #BADCC3;
+  --brand-3: #DBA380;
   --radius: 1rem;
   --background: oklch(0.985 0.01 200);
   --foreground: oklch(0.22 0.03 230);
@@ -95,9 +98,9 @@
     color: var(--color-foreground);
     font-family: var(--font-display);
     background-image:
-      radial-gradient(at 18% 12%, rgba(115, 209, 211, 0.35) 0px, transparent 55%),
-      radial-gradient(at 82% 18%, rgba(186, 220, 195, 0.4) 0px, transparent 55%),
-      radial-gradient(at 50% 90%, rgba(219, 163, 128, 0.32) 0px, transparent 55%);
+      radial-gradient(at 18% 12%, color-mix(in srgb, var(--brand-1) 35%, transparent) 0px, transparent 55%),
+      radial-gradient(at 82% 18%, color-mix(in srgb, var(--brand-2) 40%, transparent) 0px, transparent 55%),
+      radial-gradient(at 50% 90%, color-mix(in srgb, var(--brand-3) 32%, transparent) 0px, transparent 55%);
     background-attachment: fixed;
     min-height: 100vh;
   }
@@ -129,7 +132,22 @@
   .glass-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 20px 50px rgba(31, 38, 135, 0.18);
-    border-color: rgba(115, 209, 211, 0.6);
+    border-color: color-mix(in srgb, var(--brand-1) 60%, transparent);
+  }
+  .dark .glass {
+    background: rgba(20, 24, 40, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  .dark .glass-strong {
+    background: rgba(20, 24, 40, 0.6);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+  .dark .glass-card {
+    background: rgba(20, 24, 40, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
   .float-anim {
     animation: float 7s ease-in-out infinite;
