@@ -40,8 +40,6 @@
   --brand-1: #73D1D3;
   --brand-2: #BADCC3;
   --brand-3: #DBA380;
-
-:root {
   --radius: 1rem;
   --background: oklch(0.985 0.01 200);
   --foreground: oklch(0.22 0.03 230);
@@ -100,9 +98,9 @@
     color: var(--color-foreground);
     font-family: var(--font-display);
     background-image:
-      radial-gradient(at 18% 12%, rgba(115, 209, 211, 0.35) 0px, transparent 55%),
-      radial-gradient(at 82% 18%, rgba(186, 220, 195, 0.4) 0px, transparent 55%),
-      radial-gradient(at 50% 90%, rgba(219, 163, 128, 0.32) 0px, transparent 55%);
+      radial-gradient(at 18% 12%, color-mix(in srgb, var(--brand-1) 35%, transparent) 0px, transparent 55%),
+      radial-gradient(at 82% 18%, color-mix(in srgb, var(--brand-2) 40%, transparent) 0px, transparent 55%),
+      radial-gradient(at 50% 90%, color-mix(in srgb, var(--brand-3) 32%, transparent) 0px, transparent 55%);
     background-attachment: fixed;
     min-height: 100vh;
   }
