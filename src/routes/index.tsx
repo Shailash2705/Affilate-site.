@@ -261,15 +261,19 @@ function CategoryChip({
 function FeedbackSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
-  const [captcha] = useState(() => ({
-    a: Math.floor(Math.random() * 9) + 1,
-    b: Math.floor(Math.random() * 9) + 1,
-  }));
+  const [captcha, setCaptcha] = useState<{ a: number; b: number } | null>(null);
   const [captchaAnswer, setCaptchaAnswer] = useState("");
+
+  useEffect(() => {
+    setCaptcha({
+      a: Math.floor(Math.random() * 9) + 1,
+      b: Math.floor(Math.random() * 9) + 1,
+    });
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (Number(captchaAnswer) !== captcha.a + captcha.b) {
+    if (!captcha || Number(captchaAnswer) !== captcha.a + captcha.b) {
       toast.error("Captcha incorrect");
       return;
     }
@@ -325,7 +329,7 @@ function FeedbackSection() {
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Quick check:</span>
             <span className="font-medium">
-              {captcha.a} + {captcha.b} =
+              {captcha ? `${captcha.a} + ${captcha.b} =` : "… =" }
             </span>
             <Input
               type="number"
