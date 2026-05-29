@@ -261,11 +261,15 @@ function CategoryChip({
 function FeedbackSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
-  const [captcha] = useState(() => ({
-    a: Math.floor(Math.random() * 9) + 1,
-    b: Math.floor(Math.random() * 9) + 1,
-  }));
+  const [captcha, setCaptcha] = useState<{ a: number; b: number } | null>(null);
   const [captchaAnswer, setCaptchaAnswer] = useState("");
+
+  useEffect(() => {
+    setCaptcha({
+      a: Math.floor(Math.random() * 9) + 1,
+      b: Math.floor(Math.random() * 9) + 1,
+    });
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
