@@ -98,22 +98,22 @@ function Home() {
         </p>
 
         <div className="mt-8 max-w-xl mx-auto glass-strong rounded-full p-2 flex items-center gap-2">
-          <Search className="h-5 w-5 ml-3 text-muted-foreground" />
+          <Search className="h-5 w-5 ml-3 text-muted-foreground shrink-0" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products, categories, platforms..."
-            className="border-0 bg-transparent focus-visible:ring-0 shadow-none"
+            placeholder="Search products..."
+            className="border-0 bg-transparent focus-visible:ring-0 shadow-none flex-1 min-w-0"
           />
           <Button
             onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
-            className="rounded-full bg-foreground text-background hover:opacity-90"
+            className="rounded-full bg-foreground text-background hover:opacity-90 shrink-0"
           >
             Explore
           </Button>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-6 text-xs text-muted-foreground">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Secure</span>
           <span>•</span>
           <span>No ads, no clutter</span>

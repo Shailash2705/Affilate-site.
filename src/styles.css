@@ -103,6 +103,7 @@
       radial-gradient(at 50% 90%, color-mix(in srgb, var(--brand-3) 32%, transparent) 0px, transparent 55%);
     background-attachment: fixed;
     min-height: 100vh;
+    overflow-x: hidden;
   }
 }
 
