@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { ThemeToggle, PaletteSwitcher } from "@/components/theme-toggle";
 
 export function SiteHeader() {
@@ -26,9 +26,10 @@ export function SiteHeader() {
           <ThemeToggle />
           <Link
             to="/auth"
-            className="ml-1 px-3 py-1.5 rounded-full bg-foreground/90 text-background hover:opacity-90 transition"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 transition"
+            aria-label="Admin"
           >
-            Admin
+            <User className="h-4 w-4" />
           </Link>
         </div>
       </nav>
