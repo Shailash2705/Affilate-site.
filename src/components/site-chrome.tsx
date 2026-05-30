@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { ThemeToggle, PaletteSwitcher } from "@/components/theme-toggle";
 
 export function SiteHeader() {
