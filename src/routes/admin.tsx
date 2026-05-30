@@ -351,9 +351,29 @@ function ProductForm({
           value={form.image_url}
           onChange={(e) => setForm({ ...form, image_url: e.target.value })}
         />
-        <label className="flex items-center justify-center gap-2 glass rounded-xl py-2.5 cursor-pointer text-sm hover:bg-white/60 transition">
-          <Upload className="h-4 w-4" />
-          {uploading ? "Uploading..." : "Upload image"}
+        <label
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) uploadImage(f);
+          }}
+          className={`flex flex-col items-center justify-center gap-1 glass rounded-xl py-4 px-3 cursor-pointer text-sm hover:bg-white/60 transition border-2 border-dashed ${
+            dragOver ? "border-foreground/60 bg-white/60" : "border-transparent"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Upload className="h-4 w-4" />
+            {uploading ? "Uploading..." : "Click, drag & drop, or paste (Ctrl+V)"}
+          </div>
+          <span className="text-[11px] text-muted-foreground">
+            PNG, JPG, WEBP, GIF · max 5MB
+          </span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif"
