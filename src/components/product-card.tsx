@@ -1,5 +1,4 @@
 import { ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export interface Product {
   id: string;
@@ -13,7 +12,12 @@ export interface Product {
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <article className="glass-card rounded-3xl overflow-hidden flex flex-col group">
+    <a
+      href={product.affiliate_url}
+      target="_blank"
+      rel="noopener noreferrer sponsored"
+      className="glass-card rounded-3xl overflow-hidden flex flex-col group cursor-pointer"
+    >
       <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-[var(--brand-1)]/20 to-[var(--brand-3)]/20">
         {product.image_url ? (
           <img
@@ -39,19 +43,10 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
         <h3 className="font-semibold text-lg leading-tight line-clamp-2">{product.title}</h3>
         <p className="text-sm text-muted-foreground line-clamp-3 flex-1">{product.description}</p>
-        <Button
-          asChild
-          className="mt-2 bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground hover:opacity-90 rounded-full"
-        >
-          <a
-            href={product.affiliate_url}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-          >
-            View Deal <ExternalLink className="ml-2 h-4 w-4" />
-          </a>
-        </Button>
+        <div className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground px-4 py-2 text-sm font-medium group-hover:opacity-90 transition-opacity">
+          View Deal <ExternalLink className="h-4 w-4" />
+        </div>
       </div>
-    </article>
+    </a>
   );
 }
