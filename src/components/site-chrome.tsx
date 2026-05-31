@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, User } from "lucide-react";
+import { Sparkles, User, Twitter, Instagram, Youtube, Facebook } from "lucide-react";
 import { ThemeToggle, PaletteSwitcher } from "@/components/theme-toggle";
 
 export function SiteHeader() {
@@ -42,10 +42,19 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-white/40 dark:border-white/10">
       <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
         <p>© {new Date().getFullYear()} Pickly. Curated affiliate picks.</p>
-        <div className="flex gap-4">
-          <a href="#" className="hover:text-foreground transition">Twitter</a>
-          <a href="#" className="hover:text-foreground transition">Instagram</a>
-          <a href="#" className="hover:text-foreground transition">YouTube</a>
+        <div className="flex items-center gap-3">
+          <a href="#" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition" aria-label="Twitter">
+            <Twitter className="h-4 w-4" />
+          </a>
+          <a href="#" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition" aria-label="Instagram">
+            <Instagram className="h-4 w-4" />
+          </a>
+          <a href="#" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition" aria-label="YouTube">
+            <Youtube className="h-4 w-4" />
+          </a>
+          <a href="#" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition" aria-label="Facebook">
+            <Facebook className="h-4 w-4" />
+          </a>
         </div>
       </div>
     </footer>
