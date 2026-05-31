@@ -261,22 +261,9 @@ function CategoryChip({
 function FeedbackSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
-  const [captcha, setCaptcha] = useState<{ a: number; b: number } | null>(null);
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
-
-  useEffect(() => {
-    setCaptcha({
-      a: Math.floor(Math.random() * 9) + 1,
-      b: Math.floor(Math.random() * 9) + 1,
-    });
-  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!captcha || Number(captchaAnswer) !== captcha.a + captcha.b) {
-      toast.error("Captcha incorrect");
-      return;
-    }
     const parsed = feedbackSchema.safeParse(form);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Invalid input");
@@ -288,7 +275,6 @@ function FeedbackSection() {
     if (error) return toast.error("Failed to send. Please try again.");
     toast.success("Thanks! We received your message.");
     setForm({ name: "", email: "", message: "" });
-    setCaptchaAnswer("");
   }
 
   return (
@@ -325,24 +311,11 @@ function FeedbackSection() {
           rows={5}
           required
         />
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Quick check:</span>
-            <span className="font-medium">
-              {captcha ? `${captcha.a} + ${captcha.b} =` : "… =" }
-            </span>
-            <Input
-              type="number"
-              value={captchaAnswer}
-              onChange={(e) => setCaptchaAnswer(e.target.value)}
-              className="w-20"
-              required
-            />
-          </div>
+        <div className="flex justify-end">
           <Button
             type="submit"
             disabled={loading}
-            className="sm:ml-auto rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground hover:opacity-90"
+            className="rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground hover:opacity-90"
           >
             {loading ? "Sending..." : (<>Send <Send className="ml-2 h-4 w-4" /></>)}
           </Button>
