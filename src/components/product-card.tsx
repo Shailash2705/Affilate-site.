@@ -88,6 +88,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="mt-2 flex items-center gap-2">
           <a
             href={product.affiliate_url}
+            onClick={handleViewDeal}
             target="_blank"
             rel="noopener noreferrer sponsored"
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
