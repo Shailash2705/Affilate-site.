@@ -1,5 +1,6 @@
 import { ExternalLink, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { trackInteraction } from "@/lib/analytics";
 
 export interface Product {
   id: string;
