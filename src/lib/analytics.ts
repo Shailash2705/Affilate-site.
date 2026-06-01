@@ -35,7 +35,7 @@ export function trackInteraction(
       product_title: payload?.product_title?.slice(0, 200) ?? null,
       category: payload?.category ?? null,
       platform: payload?.platform ?? null,
-      meta: payload?.meta ?? null,
+      meta: (payload?.meta as never) ?? null,
     })
     .then(() => {});
 }
