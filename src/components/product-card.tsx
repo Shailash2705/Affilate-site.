@@ -13,9 +13,21 @@ export interface Product {
 }
 
 export function ProductCard({ product }: { product: Product }) {
+  const trackPayload = {
+    product_id: product.id,
+    product_title: product.title,
+    category: product.category,
+    platform: product.platform,
+  };
+
+  function handleViewDeal() {
+    trackInteraction("view_deal_click", trackPayload);
+  }
+
   async function handleShare(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    trackInteraction("share_click", trackPayload);
     try {
       if (navigator.share) {
         await navigator.share({
