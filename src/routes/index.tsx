@@ -117,7 +117,10 @@ function Home() {
             className="border-0 bg-transparent focus-visible:ring-0 shadow-none flex-1 min-w-0"
           />
           <Button
-            onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => {
+              trackInteraction("explore_click");
+              document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="rounded-full bg-foreground text-background hover:opacity-90 shrink-0"
           >
             Explore
