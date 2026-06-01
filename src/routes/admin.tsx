@@ -19,7 +19,7 @@ const IDLE_LOGOUT_MS = 30 * 60 * 1000; // 30 min
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Dashboard · Pickly" },
+      { title: "Dashboard · Smart Finds" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
