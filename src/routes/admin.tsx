@@ -97,7 +97,7 @@ function Dashboard() {
       <Toaster richColors position="top-center" />
       <header className="sticky top-4 z-40 mx-auto max-w-6xl px-4">
         <div className="glass-strong rounded-full px-5 py-3 flex items-center justify-between">
-          <Link to="/" className="font-semibold">Pickly Admin</Link>
+          <Link to="/" className="font-semibold">Smart Finds Admin</Link>
           <Button
             variant="ghost"
             onClick={() => supabase.auth.signOut()}
