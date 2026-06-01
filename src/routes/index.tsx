@@ -172,6 +172,7 @@ function Home() {
                 active={category === c.name}
                 onClick={() => {
                   setCategory(c.name);
+                  trackInteraction("category_select", { category: c.name });
                   document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
                 }}
                 label={c.name}
