@@ -288,6 +288,7 @@ function FeedbackSection() {
     const { error } = await supabase.from("feedback").insert(parsed.data);
     setLoading(false);
     if (error) return toast.error("Failed to send. Please try again.");
+    trackInteraction("feedback_submit");
     toast.success("Thanks! We received your message.");
     setForm({ name: "", email: "", message: "" });
   }
