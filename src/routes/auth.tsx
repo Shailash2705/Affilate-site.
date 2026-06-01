@@ -13,7 +13,7 @@ import { ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Admin · Pickly" },
+      { title: "Admin · Smart Finds" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
