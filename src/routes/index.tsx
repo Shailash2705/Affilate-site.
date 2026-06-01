@@ -12,6 +12,7 @@ import { ProductCard, type Product } from "@/components/product-card";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { feedbackSchema } from "@/lib/validators";
+import { trackSearch, trackInteraction } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
