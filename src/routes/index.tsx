@@ -16,13 +16,13 @@ import { feedbackSchema } from "@/lib/validators";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pickly — Curated affiliate picks" },
+      { title: "Smart Finds — Curated affiliate picks" },
       {
         name: "description",
         content:
           "Discover handpicked, premium affiliate products from Amazon, Flipkart, Myntra and more. Minimal, fast, beautifully designed.",
       },
-      { property: "og:title", content: "Pickly — Curated affiliate picks" },
+      { property: "og:title", content: "Smart Finds — Curated affiliate picks" },
       { property: "og:description", content: "Premium affiliate product showcase." },
     ],
   }),
