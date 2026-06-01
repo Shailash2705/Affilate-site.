@@ -10,7 +10,7 @@ export function SiteHeader() {
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-1)] to-[var(--brand-3)] text-white">
             <Sparkles className="h-4 w-4" />
           </span>
-          <span>Pickly</span>
+          <span>Smart Finds</span>
         </Link>
         <div className="flex items-center gap-1 text-sm">
           <a href="#categories" className="hidden sm:inline px-3 py-1.5 rounded-full hover:bg-white/40 transition">
