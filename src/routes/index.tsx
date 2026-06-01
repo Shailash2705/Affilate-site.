@@ -48,6 +48,16 @@ function Home() {
       });
   }, []);
 
+  // Debounced search tracking
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) return;
+    const t = window.setTimeout(() => {
+      trackSearch(q, category === ALL ? undefined : category);
+    }, 800);
+    return () => window.clearTimeout(t);
+  }, [query, category]);
+
   const categories = useMemo(() => {
     if (!products) return [];
     const map = new Map<string, number>();
