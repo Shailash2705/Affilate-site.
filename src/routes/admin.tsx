@@ -109,11 +109,15 @@ function Dashboard() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <Tabs defaultValue="products">
+        <Tabs defaultValue="analytics">
           <TabsList className="glass rounded-full">
+            <TabsTrigger value="analytics" className="rounded-full">Analytics</TabsTrigger>
             <TabsTrigger value="products" className="rounded-full">Products</TabsTrigger>
             <TabsTrigger value="feedback" className="rounded-full">Feedback</TabsTrigger>
           </TabsList>
+          <TabsContent value="analytics" className="mt-6">
+            <AnalyticsPanel />
+          </TabsContent>
           <TabsContent value="products" className="mt-6">
             <ProductsManager />
           </TabsContent>
