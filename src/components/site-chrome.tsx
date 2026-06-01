@@ -10,7 +10,7 @@ export function SiteHeader() {
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-1)] to-[var(--brand-3)] text-white">
             <Sparkles className="h-4 w-4" />
           </span>
-          <span>Pickly</span>
+          <span>Smart Finds</span>
         </Link>
         <div className="flex items-center gap-1 text-sm">
           <a href="#categories" className="hidden sm:inline px-3 py-1.5 rounded-full hover:bg-white/40 transition">
@@ -41,7 +41,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-white/40 dark:border-white/10">
       <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} Pickly. Curated affiliate picks.</p>
+        <p>© {new Date().getFullYear()} Smart Finds. Curated affiliate picks.</p>
         <div className="flex items-center gap-3">
           <a href="#" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition" aria-label="Twitter">
             <Twitter className="h-4 w-4" />

@@ -12,14 +12,14 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { productSchema, type ProductInput } from "@/lib/validators";
 import type { Product } from "@/components/product-card";
-import { Pencil, Trash2, Plus, LogOut, Upload } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Upload, TrendingUp, Search as SearchIcon, MousePointerClick, Share2, MessageSquare } from "lucide-react";
 
 const IDLE_LOGOUT_MS = 30 * 60 * 1000; // 30 min
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Dashboard · Pickly" },
+      { title: "Dashboard · Smart Finds" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -97,7 +97,7 @@ function Dashboard() {
       <Toaster richColors position="top-center" />
       <header className="sticky top-4 z-40 mx-auto max-w-6xl px-4">
         <div className="glass-strong rounded-full px-5 py-3 flex items-center justify-between">
-          <Link to="/" className="font-semibold">Pickly Admin</Link>
+          <Link to="/" className="font-semibold">Smart Finds Admin</Link>
           <Button
             variant="ghost"
             onClick={() => supabase.auth.signOut()}
@@ -109,11 +109,15 @@ function Dashboard() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <Tabs defaultValue="products">
+        <Tabs defaultValue="analytics">
           <TabsList className="glass rounded-full">
+            <TabsTrigger value="analytics" className="rounded-full">Analytics</TabsTrigger>
             <TabsTrigger value="products" className="rounded-full">Products</TabsTrigger>
             <TabsTrigger value="feedback" className="rounded-full">Feedback</TabsTrigger>
           </TabsList>
+          <TabsContent value="analytics" className="mt-6">
+            <AnalyticsPanel />
+          </TabsContent>
           <TabsContent value="products" className="mt-6">
             <ProductsManager />
           </TabsContent>
@@ -446,6 +450,275 @@ function FeedbackList() {
           <p className="mt-2 text-sm whitespace-pre-wrap">{f.message}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+type SearchEvent = { id: string; query: string; category: string | null; created_at: string };
+type InteractionEvent = {
+  id: string;
+  event_type: string;
+  product_id: string | null;
+  product_title: string | null;
+  category: string | null;
+  platform: string | null;
+  created_at: string;
+};
+
+const RANGES = [
+  { label: "24h", hours: 24 },
+  { label: "7d", hours: 24 * 7 },
+  { label: "30d", hours: 24 * 30 },
+  { label: "All", hours: 0 },
+];
+
+function AnalyticsPanel() {
+  const [rangeHours, setRangeHours] = useState(24 * 7);
+  const [searches, setSearches] = useState<SearchEvent[] | null>(null);
+  const [interactions, setInteractions] = useState<InteractionEvent[] | null>(null);
+
+  useEffect(() => {
+    const since =
+      rangeHours > 0
+        ? new Date(Date.now() - rangeHours * 3600 * 1000).toISOString()
+        : null;
+
+    let sq = supabase.from("search_events").select("*").order("created_at", { ascending: false }).limit(1000);
+    let iq = supabase.from("interaction_events").select("*").order("created_at", { ascending: false }).limit(2000);
+    if (since) {
+      sq = sq.gte("created_at", since);
+      iq = iq.gte("created_at", since);
+    }
+
+    setSearches(null);
+    setInteractions(null);
+    sq.then(({ data, error }) => {
+      if (error) toast.error("Failed to load searches");
+      setSearches((data as SearchEvent[]) ?? []);
+    });
+    iq.then(({ data, error }) => {
+      if (error) toast.error("Failed to load interactions");
+      setInteractions((data as InteractionEvent[]) ?? []);
+    });
+  }, [rangeHours]);
+
+  const loading = !searches || !interactions;
+
+  const topSearches = useMemo(() => {
+    if (!searches) return [];
+    const m = new Map<string, number>();
+    for (const s of searches) {
+      const k = s.query.toLowerCase().trim();
+      if (!k) continue;
+      m.set(k, (m.get(k) ?? 0) + 1);
+    }
+    return Array.from(m.entries())
+      .map(([query, count]) => ({ query, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 15);
+  }, [searches]);
+
+  const topSearchedCategories = useMemo(() => {
+    if (!searches) return [];
+    const m = new Map<string, number>();
+    for (const s of searches) {
+      if (!s.category) continue;
+      m.set(s.category, (m.get(s.category) ?? 0) + 1);
+    }
+    return Array.from(m.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+  }, [searches]);
+
+  const counts = useMemo(() => {
+    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0 };
+    return {
+      view_deal: interactions.filter((i) => i.event_type === "view_deal_click").length,
+      share: interactions.filter((i) => i.event_type === "share_click").length,
+      category: interactions.filter((i) => i.event_type === "category_select").length,
+      explore: interactions.filter((i) => i.event_type === "explore_click").length,
+      feedback: interactions.filter((i) => i.event_type === "feedback_submit").length,
+    };
+  }, [interactions]);
+
+  const topProducts = useMemo(() => {
+    if (!interactions) return [];
+    const m = new Map<string, { title: string; clicks: number; shares: number }>();
+    for (const i of interactions) {
+      if (i.event_type !== "view_deal_click" && i.event_type !== "share_click") continue;
+      const key = i.product_id ?? i.product_title ?? "unknown";
+      const cur = m.get(key) ?? { title: i.product_title ?? "(unknown)", clicks: 0, shares: 0 };
+      if (i.event_type === "view_deal_click") cur.clicks += 1;
+      else cur.shares += 1;
+      m.set(key, cur);
+    }
+    return Array.from(m.values())
+      .sort((a, b) => b.clicks + b.shares - (a.clicks + a.shares))
+      .slice(0, 10);
+  }, [interactions]);
+
+  const topClickedCategories = useMemo(() => {
+    if (!interactions) return [];
+    const m = new Map<string, number>();
+    for (const i of interactions) {
+      if (i.event_type !== "view_deal_click" || !i.category) continue;
+      m.set(i.category, (m.get(i.category) ?? 0) + 1);
+    }
+    return Array.from(m.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+  }, [interactions]);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-[var(--brand-3)]" /> Site analytics
+        </h2>
+        <div className="glass rounded-full p-1 flex gap-1 text-xs">
+          {RANGES.map((r) => (
+            <button
+              key={r.label}
+              onClick={() => setRangeHours(r.hours)}
+              className={`px-3 py-1.5 rounded-full transition ${
+                rangeHours === r.hours
+                  ? "bg-foreground text-background"
+                  : "hover:bg-white/50 dark:hover:bg-white/10"
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading && <Skeleton className="h-40 rounded-2xl bg-white/40" />}
+
+      {!loading && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <StatCard icon={<SearchIcon className="h-4 w-4" />} label="Searches" value={searches!.length} />
+            <StatCard icon={<MousePointerClick className="h-4 w-4" />} label="View Deal" value={counts.view_deal} />
+            <StatCard icon={<Share2 className="h-4 w-4" />} label="Shares" value={counts.share} />
+            <StatCard icon={<TrendingUp className="h-4 w-4" />} label="Category clicks" value={counts.category} />
+            <StatCard icon={<TrendingUp className="h-4 w-4" />} label="Explore" value={counts.explore} />
+            <StatCard icon={<MessageSquare className="h-4 w-4" />} label="Feedback" value={counts.feedback} />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-4">
+            <RankList
+              title="Top searches"
+              empty="No searches yet."
+              icon={<SearchIcon className="h-4 w-4" />}
+              items={topSearches.map((s) => ({ label: s.query, count: s.count }))}
+            />
+            <RankList
+              title="Searched categories"
+              empty="No category-filtered searches yet."
+              icon={<TrendingUp className="h-4 w-4" />}
+              items={topSearchedCategories.map((c) => ({ label: c.name, count: c.count }))}
+            />
+            <RankList
+              title="Most-clicked products"
+              empty="No product clicks yet."
+              icon={<MousePointerClick className="h-4 w-4" />}
+              items={topProducts.map((p) => ({
+                label: p.title,
+                count: p.clicks + p.shares,
+                meta: `${p.clicks} clicks · ${p.shares} shares`,
+              }))}
+            />
+            <RankList
+              title="Top clicked categories"
+              empty="No category clicks yet."
+              icon={<TrendingUp className="h-4 w-4" />}
+              items={topClickedCategories.map((c) => ({ label: c.name, count: c.count }))}
+            />
+          </div>
+
+          <div className="glass rounded-2xl p-4">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <SearchIcon className="h-4 w-4" /> Recent searches
+            </h3>
+            {searches!.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No searches yet.</p>
+            ) : (
+              <ul className="divide-y divide-white/40 dark:divide-white/10 text-sm max-h-72 overflow-auto">
+                {searches!.slice(0, 50).map((s) => (
+                  <li key={s.id} className="py-2 flex items-center justify-between gap-3">
+                    <span className="truncate">
+                      <span className="font-medium">{s.query}</span>
+                      {s.category && (
+                        <span className="ml-2 text-xs text-muted-foreground capitalize">
+                          in {s.category}
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {new Date(s.created_at).toLocaleString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+  return (
+    <div className="glass rounded-2xl p-4">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {icon} {label}
+      </div>
+      <p className="text-2xl font-bold mt-1">{value.toLocaleString()}</p>
+    </div>
+  );
+}
+
+function RankList({
+  title,
+  icon,
+  items,
+  empty,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  items: { label: string; count: number; meta?: string }[];
+  empty: string;
+}) {
+  const max = items[0]?.count ?? 1;
+  return (
+    <div className="glass rounded-2xl p-4">
+      <h3 className="font-semibold mb-3 flex items-center gap-2">
+        {icon} {title}
+      </h3>
+      {items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{empty}</p>
+      ) : (
+        <ul className="space-y-2">
+          {items.map((it, idx) => (
+            <li key={idx} className="text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="truncate capitalize">{it.label}</span>
+                <span className="text-xs font-semibold tabular-nums shrink-0">{it.count}</span>
+              </div>
+              <div className="mt-1 h-1.5 rounded-full bg-white/40 dark:bg-white/10 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)]"
+                  style={{ width: `${Math.max(6, (it.count / max) * 100)}%` }}
+                />
+              </div>
+              {it.meta && <p className="text-[11px] text-muted-foreground mt-0.5">{it.meta}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

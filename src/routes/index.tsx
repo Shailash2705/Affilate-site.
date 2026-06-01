@@ -12,17 +12,18 @@ import { ProductCard, type Product } from "@/components/product-card";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { feedbackSchema } from "@/lib/validators";
+import { trackSearch, trackInteraction } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pickly — Curated affiliate picks" },
+      { title: "Smart Finds — Curated affiliate picks" },
       {
         name: "description",
         content:
           "Discover handpicked, premium affiliate products from Amazon, Flipkart, Myntra and more. Minimal, fast, beautifully designed.",
       },
-      { property: "og:title", content: "Pickly — Curated affiliate picks" },
+      { property: "og:title", content: "Smart Finds — Curated affiliate picks" },
       { property: "og:description", content: "Premium affiliate product showcase." },
     ],
   }),
@@ -46,6 +47,16 @@ function Home() {
         setProducts((data as Product[]) ?? []);
       });
   }, []);
+
+  // Debounced search tracking
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) return;
+    const t = window.setTimeout(() => {
+      trackSearch(q, category === ALL ? undefined : category);
+    }, 800);
+    return () => window.clearTimeout(t);
+  }, [query, category]);
 
   const categories = useMemo(() => {
     if (!products) return [];
@@ -106,7 +117,10 @@ function Home() {
             className="border-0 bg-transparent focus-visible:ring-0 shadow-none flex-1 min-w-0"
           />
           <Button
-            onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => {
+              trackInteraction("explore_click");
+              document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="rounded-full bg-foreground text-background hover:opacity-90 shrink-0"
           >
             Explore
@@ -158,6 +172,7 @@ function Home() {
                 active={category === c.name}
                 onClick={() => {
                   setCategory(c.name);
+                  trackInteraction("category_select", { category: c.name });
                   document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
                 }}
                 label={c.name}
@@ -273,6 +288,7 @@ function FeedbackSection() {
     const { error } = await supabase.from("feedback").insert(parsed.data);
     setLoading(false);
     if (error) return toast.error("Failed to send. Please try again.");
+    trackInteraction("feedback_submit");
     toast.success("Thanks! We received your message.");
     setForm({ name: "", email: "", message: "" });
   }

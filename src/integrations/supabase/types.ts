@@ -38,6 +38,39 @@ export type Database = {
         }
         Relationships: []
       }
+      interaction_events: {
+        Row: {
+          category: string | null
+          created_at: string
+          event_type: string
+          id: string
+          meta: Json | null
+          platform: string | null
+          product_id: string | null
+          product_title: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          meta?: Json | null
+          platform?: string | null
+          product_id?: string | null
+          product_title?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          meta?: Json | null
+          platform?: string | null
+          product_id?: string | null
+          product_title?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           affiliate_url: string
@@ -71,6 +104,27 @@ export type Database = {
           platform?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      search_events: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          query: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          query: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          query?: string
         }
         Relationships: []
       }
