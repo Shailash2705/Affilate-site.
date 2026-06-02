@@ -623,9 +623,10 @@ function AnalyticsPanel() {
 
       {!loading && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             <StatCard icon={<SearchIcon className="h-4 w-4" />} label="Searches" value={searches!.length} />
-            <StatCard icon={<Sparkles className="h-4 w-4" />} label="Suggestion clicks" value={counts.suggestion} />
+            <StatCard icon={<Sparkles className="h-4 w-4" />} label="Sugg. views" value={counts.suggestion_impr} />
+            <StatCard icon={<Sparkles className="h-4 w-4" />} label="Sugg. clicks" value={counts.suggestion} />
             <StatCard icon={<MousePointerClick className="h-4 w-4" />} label="View Deal" value={counts.view_deal} />
             <StatCard icon={<Share2 className="h-4 w-4" />} label="Shares" value={counts.share} />
             <StatCard icon={<TrendingUp className="h-4 w-4" />} label="Category clicks" value={counts.category} />
