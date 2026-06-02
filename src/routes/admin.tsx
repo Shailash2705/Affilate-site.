@@ -537,7 +537,7 @@ function AnalyticsPanel() {
   }, [searches]);
 
   const counts = useMemo(() => {
-    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0, suggestion: 0 };
+    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0, suggestion: 0, suggestion_impr: 0 };
     return {
       view_deal: interactions.filter((i) => i.event_type === "view_deal_click").length,
       share: interactions.filter((i) => i.event_type === "share_click").length,
@@ -545,21 +545,25 @@ function AnalyticsPanel() {
       explore: interactions.filter((i) => i.event_type === "explore_click").length,
       feedback: interactions.filter((i) => i.event_type === "feedback_submit").length,
       suggestion: interactions.filter((i) => i.event_type === "suggestion_click").length,
+      suggestion_impr: interactions.filter((i) => i.event_type === "suggestion_impression").length,
     };
   }, [interactions]);
 
   const topSuggestions = useMemo(() => {
     if (!interactions) return [];
-    const m = new Map<string, number>();
+    const m = new Map<string, { label: string; clicks: number; impressions: number }>();
     for (const i of interactions) {
-      if (i.event_type !== "suggestion_click") continue;
-      const meta = (i as unknown as { meta?: { label?: string; query?: string } }).meta;
+      if (i.event_type !== "suggestion_click" && i.event_type !== "suggestion_impression") continue;
+      const meta = (i as unknown as { meta?: { label?: string; query?: string; suggestion_id?: string } }).meta;
       const label = meta?.label ?? meta?.query ?? "(unknown)";
-      m.set(label, (m.get(label) ?? 0) + 1);
+      const key = meta?.suggestion_id ?? label;
+      const cur = m.get(key) ?? { label, clicks: 0, impressions: 0 };
+      if (i.event_type === "suggestion_click") cur.clicks += 1;
+      else cur.impressions += 1;
+      m.set(key, cur);
     }
-    return Array.from(m.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
+    return Array.from(m.values())
+      .sort((a, b) => b.clicks + b.impressions - (a.clicks + a.impressions))
       .slice(0, 10);
   }, [interactions]);
 
@@ -619,9 +623,10 @@ function AnalyticsPanel() {
 
       {!loading && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             <StatCard icon={<SearchIcon className="h-4 w-4" />} label="Searches" value={searches!.length} />
-            <StatCard icon={<Sparkles className="h-4 w-4" />} label="Suggestion clicks" value={counts.suggestion} />
+            <StatCard icon={<Sparkles className="h-4 w-4" />} label="Sugg. views" value={counts.suggestion_impr} />
+            <StatCard icon={<Sparkles className="h-4 w-4" />} label="Sugg. clicks" value={counts.suggestion} />
             <StatCard icon={<MousePointerClick className="h-4 w-4" />} label="View Deal" value={counts.view_deal} />
             <StatCard icon={<Share2 className="h-4 w-4" />} label="Shares" value={counts.share} />
             <StatCard icon={<TrendingUp className="h-4 w-4" />} label="Category clicks" value={counts.category} />
@@ -658,10 +663,17 @@ function AnalyticsPanel() {
               items={topClickedCategories.map((c) => ({ label: c.name, count: c.count }))}
             />
             <RankList
-              title="Top suggestion clicks"
-              empty="No suggestion clicks yet."
+              title="Suggestion impact"
+              empty="No suggestion activity yet."
               icon={<Sparkles className="h-4 w-4" />}
-              items={topSuggestions.map((s) => ({ label: s.name, count: s.count }))}
+              items={topSuggestions.map((s) => {
+                const ctr = s.impressions > 0 ? Math.round((s.clicks / s.impressions) * 100) : 0;
+                return {
+                  label: s.label,
+                  count: s.clicks,
+                  meta: `${s.impressions} views · ${s.clicks} clicks · ${ctr}% CTR`,
+                };
+              })}
             />
           </div>
 
