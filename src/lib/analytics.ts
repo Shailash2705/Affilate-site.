@@ -15,7 +15,8 @@ export type InteractionType =
   | "share_click"
   | "category_select"
   | "explore_click"
-  | "feedback_submit";
+  | "feedback_submit"
+  | "suggestion_click";
 
 export function trackInteraction(
   event_type: InteractionType,
