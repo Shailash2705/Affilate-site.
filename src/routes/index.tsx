@@ -36,6 +36,9 @@ function Home() {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL);
+  const [suggestions, setSuggestions] = useState<
+    { id: string; label: string; query: string; category: string | null }[]
+  >([]);
 
   useEffect(() => {
     supabase
@@ -46,6 +49,14 @@ function Home() {
         if (error) toast.error("Failed to load products");
         setProducts((data as Product[]) ?? []);
       });
+
+    supabase
+      .from("suggested_queries")
+      .select("id,label,query,category")
+      .eq("enabled", true)
+      .order("position", { ascending: true })
+      .limit(12)
+      .then(({ data }) => setSuggestions(data ?? []));
   }, []);
 
   // Debounced search tracking
