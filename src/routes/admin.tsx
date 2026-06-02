@@ -537,14 +537,30 @@ function AnalyticsPanel() {
   }, [searches]);
 
   const counts = useMemo(() => {
-    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0 };
+    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0, suggestion: 0 };
     return {
       view_deal: interactions.filter((i) => i.event_type === "view_deal_click").length,
       share: interactions.filter((i) => i.event_type === "share_click").length,
       category: interactions.filter((i) => i.event_type === "category_select").length,
       explore: interactions.filter((i) => i.event_type === "explore_click").length,
       feedback: interactions.filter((i) => i.event_type === "feedback_submit").length,
+      suggestion: interactions.filter((i) => i.event_type === "suggestion_click").length,
     };
+  }, [interactions]);
+
+  const topSuggestions = useMemo(() => {
+    if (!interactions) return [];
+    const m = new Map<string, number>();
+    for (const i of interactions) {
+      if (i.event_type !== "suggestion_click") continue;
+      const meta = (i as unknown as { meta?: { label?: string; query?: string } }).meta;
+      const label = meta?.label ?? meta?.query ?? "(unknown)";
+      m.set(label, (m.get(label) ?? 0) + 1);
+    }
+    return Array.from(m.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
   }, [interactions]);
 
   const topProducts = useMemo(() => {
