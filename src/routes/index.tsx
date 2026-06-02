@@ -138,6 +138,29 @@ function Home() {
           </Button>
         </div>
 
+        {suggestions.length > 0 && (
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs text-muted-foreground mr-1">Try:</span>
+            {suggestions.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => {
+                  setQuery(s.query);
+                  if (s.category) setCategory(s.category.toLowerCase());
+                  trackInteraction("suggestion_click", {
+                    category: s.category ?? undefined,
+                    meta: { suggestion_id: s.id, label: s.label, query: s.query },
+                  });
+                  document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="glass rounded-full px-3 py-1.5 text-xs hover:bg-white/60 dark:hover:bg-white/10 transition"
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Secure</span>
           <span>•</span>
