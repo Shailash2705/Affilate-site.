@@ -663,10 +663,17 @@ function AnalyticsPanel() {
               items={topClickedCategories.map((c) => ({ label: c.name, count: c.count }))}
             />
             <RankList
-              title="Top suggestion clicks"
-              empty="No suggestion clicks yet."
+              title="Suggestion impact"
+              empty="No suggestion activity yet."
               icon={<Sparkles className="h-4 w-4" />}
-              items={topSuggestions.map((s) => ({ label: s.name, count: s.count }))}
+              items={topSuggestions.map((s) => {
+                const ctr = s.impressions > 0 ? Math.round((s.clicks / s.impressions) * 100) : 0;
+                return {
+                  label: s.label,
+                  count: s.clicks,
+                  meta: `${s.impressions} views · ${s.clicks} clicks · ${ctr}% CTR`,
+                };
+              })}
             />
           </div>
 
