@@ -12,7 +12,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { productSchema, type ProductInput } from "@/lib/validators";
 import type { Product } from "@/components/product-card";
-import { Pencil, Trash2, Plus, LogOut, Upload, TrendingUp, Search as SearchIcon, MousePointerClick, Share2, MessageSquare } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Upload, TrendingUp, Search as SearchIcon, MousePointerClick, Share2, MessageSquare, Sparkles, ArrowUp, ArrowDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 const IDLE_LOGOUT_MS = 30 * 60 * 1000; // 30 min
 
