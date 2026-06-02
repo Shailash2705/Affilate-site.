@@ -128,6 +128,39 @@ export type Database = {
         }
         Relationships: []
       }
+      suggested_queries: {
+        Row: {
+          category: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          label: string
+          position: number
+          query: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label: string
+          position?: number
+          query: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string
+          position?: number
+          query?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
