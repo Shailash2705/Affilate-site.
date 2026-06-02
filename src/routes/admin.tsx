@@ -537,7 +537,7 @@ function AnalyticsPanel() {
   }, [searches]);
 
   const counts = useMemo(() => {
-    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0, suggestion: 0 };
+    if (!interactions) return { view_deal: 0, share: 0, category: 0, explore: 0, feedback: 0, suggestion: 0, suggestion_impr: 0 };
     return {
       view_deal: interactions.filter((i) => i.event_type === "view_deal_click").length,
       share: interactions.filter((i) => i.event_type === "share_click").length,
@@ -545,21 +545,25 @@ function AnalyticsPanel() {
       explore: interactions.filter((i) => i.event_type === "explore_click").length,
       feedback: interactions.filter((i) => i.event_type === "feedback_submit").length,
       suggestion: interactions.filter((i) => i.event_type === "suggestion_click").length,
+      suggestion_impr: interactions.filter((i) => i.event_type === "suggestion_impression").length,
     };
   }, [interactions]);
 
   const topSuggestions = useMemo(() => {
     if (!interactions) return [];
-    const m = new Map<string, number>();
+    const m = new Map<string, { label: string; clicks: number; impressions: number }>();
     for (const i of interactions) {
-      if (i.event_type !== "suggestion_click") continue;
-      const meta = (i as unknown as { meta?: { label?: string; query?: string } }).meta;
+      if (i.event_type !== "suggestion_click" && i.event_type !== "suggestion_impression") continue;
+      const meta = (i as unknown as { meta?: { label?: string; query?: string; suggestion_id?: string } }).meta;
       const label = meta?.label ?? meta?.query ?? "(unknown)";
-      m.set(label, (m.get(label) ?? 0) + 1);
+      const key = meta?.suggestion_id ?? label;
+      const cur = m.get(key) ?? { label, clicks: 0, impressions: 0 };
+      if (i.event_type === "suggestion_click") cur.clicks += 1;
+      else cur.impressions += 1;
+      m.set(key, cur);
     }
-    return Array.from(m.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
+    return Array.from(m.values())
+      .sort((a, b) => b.clicks + b.impressions - (a.clicks + a.impressions))
       .slice(0, 10);
   }, [interactions]);
 
