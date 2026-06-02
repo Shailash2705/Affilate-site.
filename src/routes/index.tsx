@@ -56,7 +56,24 @@ function Home() {
       .eq("enabled", true)
       .order("position", { ascending: true })
       .limit(12)
-      .then(({ data }) => setSuggestions(data ?? []));
+      .then(({ data }) => {
+        const list = data ?? [];
+        setSuggestions(list);
+        // Fire one impression per visible chip, once per page load
+        const seenKey = "sf_sugg_impressions";
+        const seen = new Set<string>(
+          JSON.parse(sessionStorage.getItem(seenKey) ?? "[]"),
+        );
+        for (const s of list) {
+          if (seen.has(s.id)) continue;
+          seen.add(s.id);
+          trackInteraction("suggestion_impression", {
+            category: s.category ?? undefined,
+            meta: { suggestion_id: s.id, label: s.label, query: s.query },
+          });
+        }
+        sessionStorage.setItem(seenKey, JSON.stringify(Array.from(seen)));
+      });
   }, []);
 
   // Debounced search tracking
