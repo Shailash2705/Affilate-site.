@@ -749,3 +749,175 @@ function RankList({
     </div>
   );
 }
+
+type Suggestion = {
+  id: string;
+  label: string;
+  query: string;
+  category: string | null;
+  position: number;
+  enabled: boolean;
+};
+
+function SuggestionsManager() {
+  const [items, setItems] = useState<Suggestion[] | null>(null);
+  const [form, setForm] = useState({ label: "", query: "", category: "" });
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("suggested_queries")
+      .select("*")
+      .order("position", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) toast.error("Failed to load");
+    setItems((data as Suggestion[]) ?? []);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function add(e: React.FormEvent) {
+    e.preventDefault();
+    const label = form.label.trim();
+    const query = form.query.trim() || label;
+    if (!label) return toast.error("Label required");
+    if (label.length > 50) return toast.error("Label too long");
+    setSaving(true);
+    const nextPos = (items?.[items.length - 1]?.position ?? 0) + 1;
+    const { error } = await supabase.from("suggested_queries").insert({
+      label,
+      query,
+      category: form.category.trim() || null,
+      position: nextPos,
+      enabled: true,
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    setForm({ label: "", query: "", category: "" });
+    toast.success("Added");
+    load();
+  }
+
+  async function toggle(s: Suggestion) {
+    const { error } = await supabase
+      .from("suggested_queries")
+      .update({ enabled: !s.enabled })
+      .eq("id", s.id);
+    if (error) return toast.error(error.message);
+    load();
+  }
+
+  async function move(s: Suggestion, dir: -1 | 1) {
+    if (!items) return;
+    const idx = items.findIndex((i) => i.id === s.id);
+    const swap = items[idx + dir];
+    if (!swap) return;
+    await Promise.all([
+      supabase.from("suggested_queries").update({ position: swap.position }).eq("id", s.id),
+      supabase.from("suggested_queries").update({ position: s.position }).eq("id", swap.id),
+    ]);
+    load();
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this suggestion?")) return;
+    const { error } = await supabase.from("suggested_queries").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    load();
+  }
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-[var(--brand-3)]" /> Suggested searches
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Shown as chips under the search bar. Clicks are tracked in Analytics.
+        </p>
+      </div>
+
+      <form onSubmit={add} className="glass-strong rounded-2xl p-4 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+        <Input
+          placeholder="Label (e.g. Wireless earbuds)"
+          value={form.label}
+          maxLength={50}
+          onChange={(e) => setForm({ ...form, label: e.target.value })}
+          required
+        />
+        <Input
+          placeholder="Search query (optional, defaults to label)"
+          value={form.query}
+          maxLength={100}
+          onChange={(e) => setForm({ ...form, query: e.target.value })}
+        />
+        <Input
+          placeholder="Category (optional)"
+          value={form.category}
+          maxLength={50}
+          onChange={(e) => setForm({ ...form, category: e.target.value })}
+        />
+        <Button
+          type="submit"
+          disabled={saving}
+          className="rounded-full bg-foreground text-background"
+        >
+          <Plus className="h-4 w-4 mr-1" /> Add
+        </Button>
+      </form>
+
+      {!items && <Skeleton className="h-40 rounded-2xl bg-white/40" />}
+      {items && items.length === 0 && (
+        <div className="glass rounded-2xl p-8 text-center text-muted-foreground">
+          No suggestions yet. Add the first one above.
+        </div>
+      )}
+      {items && items.length > 0 && (
+        <div className="grid gap-2">
+          {items.map((s, idx) => (
+            <div key={s.id} className="glass rounded-2xl p-3 flex items-center gap-3">
+              <div className="flex flex-col">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6"
+                  disabled={idx === 0}
+                  onClick={() => move(s, -1)}
+                >
+                  <ArrowUp className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6"
+                  disabled={idx === items.length - 1}
+                  onClick={() => move(s, 1)}
+                >
+                  <ArrowDown className="h-3 w-3" />
+                </Button>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{s.label}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  query: <span className="font-mono">{s.query}</span>
+                  {s.category && <> · {s.category}</>}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Switch checked={s.enabled} onCheckedChange={() => toggle(s)} />
+                <span className="text-xs text-muted-foreground w-12">
+                  {s.enabled ? "Enabled" : "Off"}
+                </span>
+                <Button size="sm" variant="ghost" onClick={() => remove(s.id)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
