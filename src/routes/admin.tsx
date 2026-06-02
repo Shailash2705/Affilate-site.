@@ -657,6 +657,12 @@ function AnalyticsPanel() {
               icon={<TrendingUp className="h-4 w-4" />}
               items={topClickedCategories.map((c) => ({ label: c.name, count: c.count }))}
             />
+            <RankList
+              title="Top suggestion clicks"
+              empty="No suggestion clicks yet."
+              icon={<Sparkles className="h-4 w-4" />}
+              items={topSuggestions.map((s) => ({ label: s.name, count: s.count }))}
+            />
           </div>
 
           <div className="glass rounded-2xl p-4">
