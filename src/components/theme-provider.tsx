@@ -51,13 +51,16 @@ const PAL_KEY = "pickly.palette";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<Mode>("light");
-  const [palette, setPaletteState] = useState<PaletteId>("default");
+  const [palette, setPaletteState] = useState<PaletteId>(
+    () => PALETTES[Math.floor(Math.random() * PALETTES.length)].id,
+  );
 
   useEffect(() => {
     const m = (localStorage.getItem(MODE_KEY) as Mode) || "light";
-    const p = (localStorage.getItem(PAL_KEY) as PaletteId) || "default";
     setModeState(m);
-    setPaletteState(p);
+    // Randomize palette on every page load (no persistence).
+    const random = PALETTES[Math.floor(Math.random() * PALETTES.length)].id;
+    setPaletteState(random);
   }, []);
 
   useEffect(() => {
@@ -77,8 +80,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
   const setPalette = (p: PaletteId) => {
     setPaletteState(p);
-    localStorage.setItem(PAL_KEY, p);
   };
+
 
   return (
     <ThemeContext.Provider value={{ mode, palette, setMode, setPalette }}>
