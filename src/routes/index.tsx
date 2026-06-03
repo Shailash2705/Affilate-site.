@@ -141,6 +141,12 @@ function Home() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                trackInteraction("explore_click");
+                document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
             placeholder="Search products..."
             className="border-0 bg-transparent focus-visible:ring-0 shadow-none flex-1 min-w-0"
           />
