@@ -1,15 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, User, Twitter, Instagram, Youtube, Facebook } from "lucide-react";
+import { User, Twitter, Instagram, Youtube, Facebook } from "lucide-react";
 import { ThemeToggle, PaletteSwitcher } from "@/components/theme-toggle";
+import logoAsset from "@/assets/smart-finds-logo.png.asset.json";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-4 z-40 mx-auto max-w-6xl px-4">
       <nav className="glass-strong rounded-full px-5 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-semibold">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand-1)] to-[var(--brand-3)] text-white">
-            <Sparkles className="h-4 w-4" />
-          </span>
+          <img src={logoAsset.url} alt="Smart Finds logo" className="h-8 w-8 rounded-full object-contain" />
           <span>Smart Finds</span>
         </Link>
         <div className="flex items-center gap-1 text-sm">
