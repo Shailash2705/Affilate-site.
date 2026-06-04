@@ -52,7 +52,7 @@ export function ProductCard({ product }: { product: Product }) {
         rel="noopener noreferrer sponsored"
         className="block"
       >
-        <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-[var(--brand-1)]/20 to-[var(--brand-3)]/20">
+        <div className="aspect-square sm:aspect-[4/3] overflow-hidden bg-gradient-to-br from-[var(--brand-1)]/20 to-[var(--brand-3)]/20">
           {product.image_url ? (
             <img
               src={product.image_url}
@@ -67,12 +67,12 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
       </a>
-      <div className="p-5 flex flex-col gap-3 flex-1">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="px-2 py-0.5 rounded-full bg-[var(--brand-1)]/25 text-foreground/80 capitalize">
+      <div className="p-2.5 sm:p-5 flex flex-col gap-1.5 sm:gap-3 flex-1">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-[10px] sm:text-xs">
+          <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-[var(--brand-1)]/25 text-foreground/80 capitalize">
             {product.platform}
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-[var(--brand-2)]/35 text-foreground/80 capitalize">
+          <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-[var(--brand-2)]/35 text-foreground/80 capitalize">
             {product.category}
           </span>
         </div>
@@ -82,25 +82,25 @@ export function ProductCard({ product }: { product: Product }) {
           rel="noopener noreferrer sponsored"
           className="block"
         >
-          <h3 className="font-semibold text-lg leading-tight line-clamp-2 hover:underline">{product.title}</h3>
+          <h3 className="font-semibold text-xs sm:text-lg leading-tight line-clamp-2 hover:underline">{product.title}</h3>
         </a>
-        <p className="text-sm text-muted-foreground line-clamp-3 flex-1">{product.description}</p>
-        <div className="mt-2 flex items-center gap-2">
+        <p className="hidden sm:block text-sm text-muted-foreground line-clamp-3 flex-1">{product.description}</p>
+        <div className="mt-1 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
           <a
             href={product.affiliate_url}
             onClick={handleViewDeal}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+            className="flex-1 inline-flex items-center justify-center gap-1 sm:gap-2 rounded-full bg-gradient-to-r from-[var(--brand-1)] to-[var(--brand-3)] text-foreground px-2 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-sm font-medium hover:opacity-90 transition-opacity"
           >
-            View Deal <ExternalLink className="h-4 w-4" />
+            <span className="truncate">View</span> <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
           </a>
           <button
             onClick={handleShare}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-foreground/10 hover:bg-foreground/20 transition shrink-0"
+            className="inline-flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-foreground/10 hover:bg-foreground/20 transition shrink-0"
             aria-label="Share"
           >
-            <Share2 className="h-4 w-4" />
+            <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { User, Twitter, Instagram, Youtube, Facebook } from "lucide-react";
+import { User, Twitter, Instagram, Youtube, Facebook, Search } from "lucide-react";
 import { ThemeToggle, PaletteSwitcher } from "@/components/theme-toggle";
 import logoAsset from "@/assets/smart-finds-logo.png.asset.json";
 
@@ -21,6 +21,20 @@ export function SiteHeader() {
           <a href="#feedback" className="hidden md:inline px-3 py-1.5 rounded-full hover:bg-white/40 transition">
             Feedback
           </a>
+          <button
+            onClick={() => {
+              const el = document.getElementById("products");
+              el?.scrollIntoView({ behavior: "smooth" });
+              setTimeout(() => {
+                const input = document.querySelector<HTMLInputElement>('input[placeholder="Search products..."]');
+                input?.focus();
+              }, 400);
+            }}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/40 transition"
+            aria-label="Search"
+          >
+            <Search className="h-4 w-4" />
+          </button>
           <PaletteSwitcher />
           <ThemeToggle />
           <Link
