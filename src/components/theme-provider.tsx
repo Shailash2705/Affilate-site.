@@ -51,14 +51,12 @@ const PAL_KEY = "pickly.palette";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<Mode>("light");
-  const [palette, setPaletteState] = useState<PaletteId>(
-    () => PALETTES[Math.floor(Math.random() * PALETTES.length)].id,
-  );
+  // Deterministic default for SSR; randomize on client after mount to avoid hydration mismatch.
+  const [palette, setPaletteState] = useState<PaletteId>(PALETTES[0].id);
 
   useEffect(() => {
     const m = (localStorage.getItem(MODE_KEY) as Mode) || "light";
     setModeState(m);
-    // Randomize palette on every page load (no persistence).
     const random = PALETTES[Math.floor(Math.random() * PALETTES.length)].id;
     setPaletteState(random);
   }, []);
