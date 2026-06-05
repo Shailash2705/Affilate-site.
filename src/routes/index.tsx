@@ -259,7 +259,7 @@ function Home() {
         </div>
 
         {!filtered && (
-          <div className="grid grid-cols-3 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-[380px] rounded-3xl bg-white/40" />
             ))}
